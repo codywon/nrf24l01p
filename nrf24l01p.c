@@ -1,7 +1,7 @@
 #define DRIVER_NAME "nrf24l01p"
-#define __dbg(fmt, args...) 			\
+#define _dbg(fmt, args...) 			\
 	pr_debug("[DEBUG] " DRIVER_NAME 	\
-		"::%s(%d): " fmt "\n", 		\
+		":%s(%d): " fmt "\n", 		\
 		__func__, __LINE__, ##args)
 
 /* bitops */
@@ -48,7 +48,7 @@
 #define _RX_DR BIT(6)
 #define _TX_DS BIT(5)
 #define OBSERVE_TX_REG  0x08
-#define CD_REG          0x09
+#define RPD_REG         0x09
 #define RX_ADDR_P0_REG  0x0a
 #define RX_ADDR_P1_REG  0x0b
 #define RX_ADDR_P2_REG  0x0c
@@ -78,23 +78,23 @@
 #include <linux/workqueue.h>
 
 typedef enum {
-	__CMD_R_REGISTER,
-	__CMD_W_REGISTER,
-	__CMD_R_RX_PAYLOAD,
-	__CMD_W_TX_PAYLOAD,
-	__CMD_FLUSH_TX,
-	__CMD_FLUSH_RX,
-	__CMD_REUSE_TX_PL,
-	__CMD_R_RX_PL_WID,
-	__CMD_W_ACK_PAYLOAD,
-	__CMD_W_TX_PAYLOAD_NO_ACK,
-	__CMD_NOP,
+	_CMD_R_REGISTER,
+	_CMD_W_REGISTER,
+	_CMD_R_RX_PAYLOAD,
+	_CMD_W_TX_PAYLOAD,
+	_CMD_FLUSH_TX,
+	_CMD_FLUSH_RX,
+	_CMD_REUSE_TX_PL,
+	_CMD_R_RX_PL_WID,
+	_CMD_W_ACK_PAYLOAD,
+	_CMD_W_TX_PAYLOAD_NO_ACK,
+	_CMD_NOP,
 } nrf24l01p_cmd_t;
 
 struct nrf24l01p {
 	struct spi_device *spi;
 	struct spi_message m;
-#define NRF24L01P_SPI_TRANSFER_MAX 10
+#define NRF24L01P_SPI_TRANSFER_MAX 128
 	struct spi_transfer t[NRF24L01P_SPI_TRANSFER_MAX];
 	unsigned int spi_transfer_index;
 	u8 status;
@@ -115,24 +115,26 @@ static int _spi_push_cmd(struct nrf24l01p *rf,
 		return -1;
 	}
 
+	if (i > 0)
+		rf->t[i-1].cs_change = 1;
+
 	switch (cmd) {
-	case __CMD_FLUSH_TX:
-	case __CMD_FLUSH_RX:
-	case __CMD_REUSE_TX_PL:
-	case __CMD_NOP:
+	case _CMD_FLUSH_TX:
+	case _CMD_FLUSH_RX:
+	case _CMD_REUSE_TX_PL:
+	case _CMD_NOP:
 		rf->t[i] = (struct spi_transfer) {
 			.tx_buf = op,
 			.len = 1,
 		};
 		rf->spi_transfer_index++;
 		break;
-	case __CMD_R_RX_PL_WID:
-	case __CMD_R_RX_PAYLOAD:
-	case __CMD_R_REGISTER:
+	case _CMD_R_RX_PL_WID:
+	case _CMD_R_RX_PAYLOAD:
+	case _CMD_R_REGISTER:
 		rf->t[i] = (struct spi_transfer) {
 			.tx_buf = op,
 			.len = 1,
-			.cs_change = 1,
 		};
 		rf->t[i+1] = (struct spi_transfer) {
 			.rx_buf = val,
@@ -142,10 +144,10 @@ static int _spi_push_cmd(struct nrf24l01p *rf,
 		spi_message_add_tail(&rf->t[i+1], &rf->m);
 		rf->spi_transfer_index += 2;
 		break;
-	case __CMD_W_REGISTER:
-	case __CMD_W_TX_PAYLOAD:
-	case __CMD_W_ACK_PAYLOAD:
-	case __CMD_W_TX_PAYLOAD_NO_ACK:
+	case _CMD_W_REGISTER:
+	case _CMD_W_TX_PAYLOAD:
+	case _CMD_W_ACK_PAYLOAD:
+	case _CMD_W_TX_PAYLOAD_NO_ACK:
 		rf->t[i] = (struct spi_transfer) {
 			.tx_buf = op,
 			.len = 1,
@@ -185,7 +187,7 @@ static int _spi_async(struct nrf24l01p *rf,
 	return spi_async(rf->spi, &rf->m);
 }
 
-static void __wrk_complete(void *arg)
+static void _wrk_complete(void *arg)
 {
 	struct work_struct *w = arg;
 	schedule_work(w);
@@ -194,18 +196,17 @@ static void __wrk_complete(void *arg)
 static int _spi_worker(struct nrf24l01p *rf,
 		struct work_struct *w)
 {
-	return _spi_async(rf, __wrk_complete, w);
+	return _spi_async(rf, _wrk_complete, w);
 }
 
 static void _spi_reinit(struct nrf24l01p *rf)
 {
-	memset(&rf->m, '\0', sizeof(rf->m));
 	memset(rf->t, '\0', sizeof(rf->t));
 	spi_message_init(&rf->m);
 	rf->spi_transfer_index = 0;
 }
 
-static size_t __rx_pld_siz(struct nrf24l01p *rf, u8 pipe_no)
+static size_t _rx_pld_siz(struct nrf24l01p *rf, u8 pipe_no)
 {
 	u8 feature_val, feature_cmd = R_REGISTER(FEATURE_REG);
 	u8 dynpd_val, dynpd_cmd = R_REGISTER(DYNPD_REG);
@@ -214,19 +215,19 @@ static size_t __rx_pld_siz(struct nrf24l01p *rf, u8 pipe_no)
 
 	_spi_reinit(rf);
 	_spi_push_cmd(rf,
-		__CMD_R_REGISTER,
+		_CMD_R_REGISTER,
 		&feature_cmd,
 		&feature_val, 1);
 	_spi_push_cmd(rf,
-		__CMD_R_REGISTER,
+		_CMD_R_REGISTER,
 		&dynpd_cmd,
 		&dynpd_val, 1);
 	_spi_push_cmd(rf,
-		__CMD_R_REGISTER,
+		_CMD_R_REGISTER,
 		&rx_pw_p_cmd,
 		&rx_pw_p_val, 1);
 	_spi_push_cmd(rf,
-		__CMD_R_RX_PL_WID,
+		_CMD_R_RX_PL_WID,
 		&r_rx_pld_wid_cmd,
 		&r_rx_pld_wid_val, 1);
 	_spi_sync(rf);
@@ -238,6 +239,86 @@ static size_t __rx_pld_siz(struct nrf24l01p *rf, u8 pipe_no)
 
 	return rx_pw_p_val;
 }
+
+ssize_t show_reg(struct device *dev, struct device_attribute *attr, char *buf)
+{
+	struct spi_device *spi = to_spi_device(dev);
+	struct nrf24l01p *rf   = spi_get_drvdata(spi);
+	int r; /* register index */
+	unsigned int off = 0;
+	u8 regs_cmd[FEATURE_REG + 1];
+	u8 regs_val[FEATURE_REG + 1][5];
+
+	_spi_reinit(rf);
+	for (r = CONFIG_REG; r <= FEATURE_REG; r++) {
+		regs_cmd[r] = R_REGISTER(r);
+		switch (r) {
+		case CONFIG_REG ... RPD_REG:
+		case RX_PW_P0_REG ... FIFO_STATUS_REG:
+		case DYNPD_REG:
+		case FEATURE_REG:
+		case RX_ADDR_P2_REG ... RX_ADDR_P5_REG:
+			_spi_push_cmd(rf,
+				_CMD_R_REGISTER,
+				&regs_cmd[r],
+				regs_val[r], 1);
+			break;
+		case RX_ADDR_P0_REG:
+		case RX_ADDR_P1_REG:
+		case TX_ADDR_REG:
+			_spi_push_cmd(rf,
+				_CMD_R_REGISTER,
+				&regs_cmd[r],
+				regs_val[r], 5);
+			break;
+		default:
+			break;
+		}	
+
+	}
+	_spi_sync(rf);
+	for (r = CONFIG_REG; r <= FEATURE_REG; r++) {
+		switch (r) {
+		case CONFIG_REG ... RPD_REG:
+		case RX_PW_P0_REG ... FIFO_STATUS_REG:
+		case DYNPD_REG:
+		case FEATURE_REG:
+		case RX_ADDR_P2_REG ... RX_ADDR_P5_REG:
+			off += scnprintf(buf + off,
+					PAGE_SIZE - off,
+					"%02x:%02x\n",
+					regs_cmd[r], regs_val[r][0]);
+			break;
+		case RX_ADDR_P0_REG:
+		case RX_ADDR_P1_REG:
+		case TX_ADDR_REG:
+			off += scnprintf(buf + off,
+					PAGE_SIZE - off,
+					"%02x:%02x%02x%02x%02x%02x\n",
+					regs_cmd[r], 
+					regs_val[r][0],
+					regs_val[r][1],
+					regs_val[r][2],
+					regs_val[r][3],
+					regs_val[r][4]);
+			break;
+		default:
+			break;
+		}	
+
+	}
+	return off;
+}
+
+static DEVICE_ATTR(registers, 0400, show_reg, NULL);
+
+static struct attribute *_attrs[] = {
+	&dev_attr_registers.attr,
+	NULL,
+};
+static struct attribute_group _attr_group = {
+	.attrs = _attrs,
+};
 
 static void nrf24l01p_irq_worker(struct work_struct *w)
 {
@@ -255,7 +336,7 @@ static void nrf24l01p_irq_worker(struct work_struct *w)
 	}
 	_spi_reinit(rf);
 	_spi_push_cmd(rf,
-		__CMD_W_REGISTER,
+		_CMD_W_REGISTER,
 		&status_cmd,
 		status_val, 1);
 	_spi_sync(rf);
@@ -269,7 +350,7 @@ static irqreturn_t nrf24l01p_irq(int irq, void *arg)
 	INIT_WORK(&rf->irq_worker, nrf24l01p_irq_worker);
 	_spi_reinit(rf);
 	_spi_push_cmd(rf,
-		__CMD_R_REGISTER,
+		_CMD_R_REGISTER,
 		&status_cmd,
 		&status_val, 1);
 	BUG_ON(_spi_worker(rf, &rf->irq_worker));
@@ -282,7 +363,7 @@ static int nrf24l01p_probe(struct spi_device *spi)
 	int gpio_ce, gpio_irq;
 	struct nrf24l01p*rf = NULL;
 	struct device_node *np= spi->dev.of_node;
-	__dbg("");
+	_dbg("");
 
 	if (!np) {
 		dev_err(&spi->dev, "no device-tree node");
@@ -318,23 +399,17 @@ static int nrf24l01p_probe(struct spi_device *spi)
 		goto free_rf;
 	}
 	rf->ce = gpio_ce;
+	rf->spi = spi;
 
-	{ 
-		u8 tx_addr_cmd = R_REGISTER(TX_ADDR_REG);
-		u8 tx_addr[5];
-		_spi_reinit(rf);
-		_spi_push_cmd(rf, 
-			__CMD_R_REGISTER,
-			&tx_addr_cmd,
-			tx_addr, 5);	
-		_spi_sync(rf);
-		__dbg("TX addr: %02x:%02x:%02x:%02x:%02x",
-			tx_addr[0], tx_addr[1], tx_addr[2], 
-			tx_addr[3], tx_addr[4]); 
-
+	status = sysfs_create_group(&spi->dev.kobj, &_attr_group);	
+	if (status) {
+		dev_err(&spi->dev, "sysfs_create_group failed");
+		goto free_rf;
 	}
 
 	return 0;
+/* sysfs_remove:
+	sysfs_remove_group(&spi->dev.kobj, &_attr_group); */
 free_rf:
 	kfree(rf);
 	return status;
@@ -343,20 +418,21 @@ free_rf:
 static int nrf24l01p_remove(struct spi_device *spi)
 {
 	struct nrf24l01p*rf = spi_get_drvdata(spi);
-	__dbg("");
+	_dbg("");
+	sysfs_remove_group(&spi->dev.kobj, &_attr_group);
 	free_irq(spi->irq, rf);
 	kfree(rf);
 	return 0;
 }
 
 static const struct of_device_id nrf24l01p_of_ids[] = {
-        { .compatible = "nrf24l01+" },
+        { .compatible = "nrf24l01p" },
         {},
 };
 
 static struct spi_driver nrf24l01p_driver = {
 	.driver =  {
-		.name = "nrf24l01+",
+		.name = "nrf24l01p",
 		.owner = THIS_MODULE,
 		.of_match_table = nrf24l01p_of_ids,
 	},
@@ -366,13 +442,13 @@ static struct spi_driver nrf24l01p_driver = {
 
 int nrf24l01p_init(void)
 {
-	__dbg("");
+	_dbg("");
 	return spi_register_driver(&nrf24l01p_driver);
 }
 
 void nrf24l01p_exit(void)
 {
-	__dbg("");
+	_dbg("");
 	spi_unregister_driver(&nrf24l01p_driver);
 }
 module_init(nrf24l01p_init);
