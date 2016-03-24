@@ -1,0 +1,115 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+ACTIVATE	nrf24l01p.c	22;"	d	file:
+CD_REG	nrf24l01p.c	51;"	d	file:
+CONFIG_REG	nrf24l01p.c	28;"	d	file:
+DRIVER_NAME	nrf24l01p.c	1;"	d	file:
+DYNPD_REG	nrf24l01p.c	66;"	d	file:
+EN_AA_REG	nrf24l01p.c	29;"	d	file:
+EN_RXADDR_REG	nrf24l01p.c	30;"	d	file:
+FEATURE_REG	nrf24l01p.c	67;"	d	file:
+FIFO_STATUS_REG	nrf24l01p.c	65;"	d	file:
+FLUSH_RX	nrf24l01p.c	20;"	d	file:
+FLUSH_TX	nrf24l01p.c	19;"	d	file:
+NOP_CMD	nrf24l01p.c	25;"	d	file:
+NRF24L01P_RF_SETUP	nrf24l01p.c	46;"	d	file:
+NRF24L01P_RF_SETUP_CONT_WAVE	nrf24l01p.c	40;"	d	file:
+NRF24L01P_RF_SETUP_PLL_LOCK	nrf24l01p.c	42;"	d	file:
+NRF24L01P_RF_SETUP_RF_DR_HIGH	nrf24l01p.c	43;"	d	file:
+NRF24L01P_RF_SETUP_RF_DR_LOW	nrf24l01p.c	41;"	d	file:
+NRF24L01P_RF_SETUP_RF_PWR_HIGH	nrf24l01p.c	44;"	d	file:
+NRF24L01P_RF_SETUP_RF_PWR_LOW	nrf24l01p.c	45;"	d	file:
+NRF24L01P_SPI_TRANSFER_MAX	nrf24l01p.c	97;"	d	file:
+NRF24L01_RF_SETUP_LNA_HCURR	nrf24l01p.c	39;"	d	file:
+NRF24L01_RF_SETUP_PLL_LOCK	nrf24l01p.c	35;"	d	file:
+NRF24L01_RF_SETUP_RF_DR	nrf24l01p.c	36;"	d	file:
+NRF24L01_RF_SETUP_RF_PWR_HIGH	nrf24l01p.c	37;"	d	file:
+NRF24L01_RF_SETUP_RF_PWR_LOW	nrf24l01p.c	38;"	d	file:
+OBSERVE_TX_REG	nrf24l01p.c	50;"	d	file:
+REUSE_TX_PL	nrf24l01p.c	21;"	d	file:
+RF_CH_REG	nrf24l01p.c	33;"	d	file:
+RF_SETUP_REG	nrf24l01p.c	34;"	d	file:
+RX_ADDR_P0_REG	nrf24l01p.c	52;"	d	file:
+RX_ADDR_P1_REG	nrf24l01p.c	53;"	d	file:
+RX_ADDR_P2_REG	nrf24l01p.c	54;"	d	file:
+RX_ADDR_P3_REG	nrf24l01p.c	55;"	d	file:
+RX_ADDR_P4_REG	nrf24l01p.c	56;"	d	file:
+RX_ADDR_P5_REG	nrf24l01p.c	57;"	d	file:
+RX_PW_P0_REG	nrf24l01p.c	59;"	d	file:
+RX_PW_P1_REG	nrf24l01p.c	60;"	d	file:
+RX_PW_P2_REG	nrf24l01p.c	61;"	d	file:
+RX_PW_P3_REG	nrf24l01p.c	62;"	d	file:
+RX_PW_P4_REG	nrf24l01p.c	63;"	d	file:
+RX_PW_P5_REG	nrf24l01p.c	64;"	d	file:
+R_REGISTER	nrf24l01p.c	13;"	d	file:
+R_RX_PAYLOAD	nrf24l01p.c	17;"	d	file:
+R_RX_PL_WID	nrf24l01p.c	23;"	d	file:
+SETUP_AW_REG	nrf24l01p.c	31;"	d	file:
+SETUP_RETR_REG	nrf24l01p.c	32;"	d	file:
+STATUS_REG	nrf24l01p.c	47;"	d	file:
+TX_ADDR_REG	nrf24l01p.c	58;"	d	file:
+W_ACK_PAYLOAD	nrf24l01p.c	15;"	d	file:
+W_REGISTER	nrf24l01p.c	14;"	d	file:
+W_TX_PAYLOAD	nrf24l01p.c	18;"	d	file:
+W_TX_PAYLOAD_NO_ACK	nrf24l01p.c	24;"	d	file:
+_RX_DR	nrf24l01p.c	48;"	d	file:
+_TX_DS	nrf24l01p.c	49;"	d	file:
+__CMD_FLUSH_RX	nrf24l01p.c	/^	__CMD_FLUSH_RX,$/;"	e	enum:__anon1	file:
+__CMD_FLUSH_TX	nrf24l01p.c	/^	__CMD_FLUSH_TX,$/;"	e	enum:__anon1	file:
+__CMD_NOP	nrf24l01p.c	/^	__CMD_NOP,$/;"	e	enum:__anon1	file:
+__CMD_REUSE_TX_PL	nrf24l01p.c	/^	__CMD_REUSE_TX_PL,$/;"	e	enum:__anon1	file:
+__CMD_R_REGISTER	nrf24l01p.c	/^	__CMD_R_REGISTER,$/;"	e	enum:__anon1	file:
+__CMD_R_RX_PAYLOAD	nrf24l01p.c	/^	__CMD_R_RX_PAYLOAD,$/;"	e	enum:__anon1	file:
+__CMD_R_RX_PL_WID	nrf24l01p.c	/^	__CMD_R_RX_PL_WID,$/;"	e	enum:__anon1	file:
+__CMD_W_ACK_PAYLOAD	nrf24l01p.c	/^	__CMD_W_ACK_PAYLOAD,$/;"	e	enum:__anon1	file:
+__CMD_W_REGISTER	nrf24l01p.c	/^	__CMD_W_REGISTER,$/;"	e	enum:__anon1	file:
+__CMD_W_TX_PAYLOAD	nrf24l01p.c	/^	__CMD_W_TX_PAYLOAD,$/;"	e	enum:__anon1	file:
+__CMD_W_TX_PAYLOAD_NO_ACK	nrf24l01p.c	/^	__CMD_W_TX_PAYLOAD_NO_ACK,$/;"	e	enum:__anon1	file:
+__dbg	nrf24l01p.c	2;"	d	file:
+__flush_rx	nrf24l01p.c	/^static int __flush_rx(struct spi_device *spi)$/;"	f	file:
+__flush_tx	nrf24l01p.c	/^static int __flush_tx(struct spi_device *spi)$/;"	f	file:
+__read_reg	nrf24l01p.c	/^static int __read_reg(struct spi_device *spi, u8 reg, u8 *val, int len)$/;"	f	file:
+__read_rx	nrf24l01p.c	/^static int __read_rx(struct spi_device *spi, u8 *payload, int len)$/;"	f	file:
+__read_rx_pld_wid	nrf24l01p.c	/^static int __read_rx_pld_wid(struct spi_device *spi,$/;"	f	file:
+__rx_pld_siz	nrf24l01p.c	/^static size_t __rx_pld_siz(struct spi_device *spi, u8 pipe_no)$/;"	f	file:
+__write_reg	nrf24l01p.c	/^static int __write_reg(struct spi_device *spi, u8 reg, u8 *val, int len)$/;"	f	file:
+__write_tx	nrf24l01p.c	/^static int __write_tx(struct spi_device *spi, u8 *val, int len)$/;"	f	file:
+__wrk_complete	nrf24l01p.c	/^static void __wrk_complete(void *arg)$/;"	f	file:
+_rreg_pop	nrf24l01p.c	/^static u8 *_rreg_pop(struct nrf24l01p *rf)$/;"	f	file:
+_rreg_push	nrf24l01p.c	/^static int _rreg_push(struct nrf24l01p *rf, u8 *reg, u8 *val, int len)$/;"	f	file:
+_rreg_sync	nrf24l01p.c	/^static int _rreg_sync(struct nrf24l01p *rf, u8 reg, u8 *val, int len)$/;"	f	file:
+ce	nrf24l01p.c	/^	int ce;$/;"	m	struct:nrf24l01p	file:
+clearbit	nrf24l01p.c	10;"	d	file:
+irq_work	nrf24l01p.c	/^	struct work_struct irq_work;$/;"	m	struct:nrf24l01p	typeref:struct:nrf24l01p::work_struct	file:
+isset	nrf24l01p.c	8;"	d	file:
+m	nrf24l01p.c	/^	struct spi_message m;$/;"	m	struct:nrf24l01p	typeref:struct:nrf24l01p::spi_message	file:
+nrf24l01p	nrf24l01p.c	/^struct nrf24l01p {$/;"	s	file:
+nrf24l01p_cmd_t	nrf24l01p.c	/^} nrf24l01p_cmd_t;$/;"	t	typeref:enum:__anon1	file:
+nrf24l01p_driver	nrf24l01p.c	/^static struct spi_driver nrf24l01p_driver = {$/;"	v	typeref:struct:spi_driver	file:
+nrf24l01p_exit	nrf24l01p.c	/^module_exit(nrf24l01p_exit);$/;"	v
+nrf24l01p_exit	nrf24l01p.c	/^void nrf24l01p_exit(void)$/;"	f
+nrf24l01p_init	nrf24l01p.c	/^int nrf24l01p_init(void)$/;"	f
+nrf24l01p_init	nrf24l01p.c	/^module_init(nrf24l01p_init);$/;"	v
+nrf24l01p_irq	nrf24l01p.c	/^static irqreturn_t nrf24l01p_irq(struct nrf24l01p *rf)$/;"	f	file:
+nrf24l01p_of_ids	nrf24l01p.c	/^static const struct of_device_id nrf24l01p_of_ids[] = {$/;"	v	typeref:struct:of_device_id	file:
+nrf24l01p_probe	nrf24l01p.c	/^static int nrf24l01p_probe(struct spi_device *spi)$/;"	f	file:
+nrf24l01p_remove	nrf24l01p.c	/^static int nrf24l01p_remove(struct spi_device *spi)$/;"	f	file:
+nrf24l01p_spi_async	nrf24l01p.c	/^static int nrf24l01p_spi_async(struct nrf24l01p *rf,$/;"	f	file:
+nrf24l01p_spi_pop_cmd	nrf24l01p.c	/^static inline u8 *nrf24l01p_spi_pop_cmd(struct nrf24l01p *rf)$/;"	f	file:
+nrf24l01p_spi_pop_cmd	nrf24l01p.c	173;"	d	file:
+nrf24l01p_spi_push_cmd	nrf24l01p.c	/^static int nrf24l01p_spi_push_cmd(struct nrf24l01p *rf,$/;"	f	file:
+nrf24l01p_spi_reinit	nrf24l01p.c	/^static void nrf24l01p_spi_reinit(struct nrf24l01p *rf)$/;"	f	file:
+nrf24l01p_spi_sync	nrf24l01p.c	/^static int nrf24l01p_spi_sync(struct nrf24l01p *rf)$/;"	f	file:
+nrf24l01p_spi_worker	nrf24l01p.c	/^static int nrf24l01p_spi_worker(struct nrf24l01p *rf,$/;"	f	file:
+nrf24l_irq	nrf24l01p.c	/^static irqreturn_t nrf24l_irq(int irq, void *data)$/;"	f	file:
+setbit	nrf24l01p.c	9;"	d	file:
+spi	nrf24l01p.c	/^	struct spi_device *spi;$/;"	m	struct:nrf24l01p	typeref:struct:nrf24l01p::spi_device	file:
+spi_transfer_index	nrf24l01p.c	/^	unsigned int spi_transfer_index;$/;"	m	struct:nrf24l01p	file:
+status	nrf24l01p.c	/^	u8 status;$/;"	m	struct:nrf24l01p	file:
+t	nrf24l01p.c	/^	struct spi_transfer t[NRF24L01P_SPI_TRANSFER_MAX];$/;"	m	struct:nrf24l01p	typeref:struct:nrf24l01p::spi_transfer	file:
+tx_skb	nrf24l01p.c	/^	struct sk_buff *tx_skb;$/;"	m	struct:nrf24l01p	typeref:struct:nrf24l01p::sk_buff	file:
+tx_work	nrf24l01p.c	/^	struct work_struct tx_work;$/;"	m	struct:nrf24l01p	typeref:struct:nrf24l01p::work_struct	file:
