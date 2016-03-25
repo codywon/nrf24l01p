@@ -76,6 +76,8 @@
 #include <linux/of.h>
 #include <linux/of_gpio.h>
 #include <linux/workqueue.h>
+#include <linux/netdevice.h>
+#include <linux/etherdevice.h>
 
 typedef enum {
 	_CMD_R_REGISTER,
@@ -92,6 +94,7 @@ typedef enum {
 } nrf24l01p_cmd_t;
 
 struct nrf24l01p {
+	struct net_device *netdev;
 	struct spi_device *spi;
 	struct spi_message m;
 #define NRF24L01P_SPI_TRANSFER_MAX 128
@@ -357,12 +360,65 @@ static irqreturn_t nrf24l01p_irq(int irq, void *arg)
 	return IRQ_HANDLED;
 }
 
+/* netdevice stuff */
+static int nrf24l01p_net_open(struct net_device *net)
+{
+	return 0;
+}
+
+static int nrf24l01p_net_stop(struct net_device *net)
+{
+	return 0;
+}
+
+static const struct net_device_ops nrf24l01p_netdev_ops = {
+	.ndo_open 		= nrf24l01p_net_open,
+	.ndo_stop 		= nrf24l01p_net_stop,
+};
+
+static void nrf24l01p_get_drvinfo(struct net_device *dev, struct ethtool_drvinfo *info)
+{
+
+}
+
+static int nrf24l01p_get_settings(struct net_device *dev, struct ethtool_cmd *cmd)
+{
+	return 0;
+}
+static int nrf24l01p_set_settings(struct net_device *dev, struct ethtool_cmd *cmd)
+{
+	return 0;
+}
+
+static u32 nrf24l01p_get_msglevel(struct net_device *dev)
+{
+	return 0;
+}
+
+static void nrf24l01p_set_msglevel(struct net_device *dev, u32 val)
+{
+
+}
+
+static const struct ethtool_ops nrf24l01p_ethtool_ops = {
+	.get_settings = nrf24l01p_get_settings,
+	.set_settings = nrf24l01p_set_settings,
+	.get_drvinfo  = nrf24l01p_get_drvinfo,
+	.get_msglevel = nrf24l01p_get_msglevel,
+	.set_msglevel = nrf24l01p_set_msglevel,
+};
+
+static void nrf24l01p_net_init(struct net_device *net)
+{
+}
+
 static int nrf24l01p_probe(struct spi_device *spi)
 {
 	int status = -ENODEV;
 	int gpio_ce, gpio_irq;
 	struct nrf24l01p*rf = NULL;
 	struct device_node *np= spi->dev.of_node;
+	struct net_device *net;
 	_dbg("");
 
 	if (!np) {
@@ -370,33 +426,48 @@ static int nrf24l01p_probe(struct spi_device *spi)
 		return -ENODEV;
 	}
 
-	rf = kzalloc(sizeof(*rf), GFP_KERNEL);
-	if (!rf) {
+	net = alloc_netdev(sizeof(*rf), "nrf24l01p%d", NET_NAME_UNKNOWN, nrf24l01p_net_init);
+	if (!net) {
 		dev_err(&spi->dev, "no memory");
 		return -ENOMEM;
 	}
-
+	net->if_port = IF_PORT_10BASET;
+	net->irq = spi->irq;
+	net->netdev_ops = &nrf24l01p_netdev_ops;
+#define TX_TIMEOUT (4 * HZ)
+	net->watchdog_timeo = TX_TIMEOUT;
+	net->ethtool_ops = &nrf24l01p_ethtool_ops;
+	SET_NETDEV_DEV(net, &spi->dev);
+	status = register_netdev(net);
+	if (status) {
+		dev_err(&spi->dev, "register netdev " DRIVER_NAME
+				" failed %d\n", status);
+		goto free_netdev;
+	}
+	rf = netdev_priv(net);
+	rf->netdev = net;
+	memset(rf, '\0', sizeof(*rf));
 	gpio_irq = of_get_named_gpio(np, "gpio-irq", 0);
 	gpio_ce  = of_get_named_gpio(np, "gpio-ce", 0);
 	if (gpio_irq < 0 ||
 	    gpio_ce  < 0) {
 		dev_err(&spi->dev, "no gpio-ce or gpio-irq in device-tree node");
 		status = -ENODEV;
-		goto free_rf;
+		goto unregister_netdev;
 	}
 
 	spi->irq = gpio_to_irq(gpio_irq);
 	if (spi->irq < 0) {
 		dev_err(&spi->dev, "invalid irq");
 		status = -ENODEV;
-		goto free_rf;
+		goto free_netdev;
 	}
 	spi_set_drvdata(spi, rf);
 
 	status = request_irq(spi->irq, nrf24l01p_irq, IRQF_TRIGGER_FALLING, "nRF24L01+", rf);
 	if (status) {
 		dev_err(&spi->dev, "request_irq failed");
-		goto free_rf;
+		goto free_netdev;
 	}
 	rf->ce = gpio_ce;
 	rf->spi = spi;
@@ -404,14 +475,18 @@ static int nrf24l01p_probe(struct spi_device *spi)
 	status = sysfs_create_group(&spi->dev.kobj, &_attr_group);	
 	if (status) {
 		dev_err(&spi->dev, "sysfs_create_group failed");
-		goto free_rf;
+		goto free_irq;
 	}
 
 	return 0;
 /* sysfs_remove:
 	sysfs_remove_group(&spi->dev.kobj, &_attr_group); */
-free_rf:
-	kfree(rf);
+free_irq:
+	free_irq(spi->irq, rf);
+unregister_netdev:
+	unregister_netdev(net);
+free_netdev:
+	free_netdev(net);
 	return status;
 }
 
@@ -421,7 +496,8 @@ static int nrf24l01p_remove(struct spi_device *spi)
 	_dbg("");
 	sysfs_remove_group(&spi->dev.kobj, &_attr_group);
 	free_irq(spi->irq, rf);
-	kfree(rf);
+	unregister_netdev(rf->netdev);
+	free_netdev(rf->netdev);
 	return 0;
 }
 
