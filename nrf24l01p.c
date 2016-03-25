@@ -371,41 +371,15 @@ static int nrf24l01p_net_stop(struct net_device *net)
 	return 0;
 }
 
+static int nrf24l01p_net_set_mac_address(struct net_device *net, void *addr)
+{
+	return 0;
+}
+
 static const struct net_device_ops nrf24l01p_netdev_ops = {
 	.ndo_open 		= nrf24l01p_net_open,
 	.ndo_stop 		= nrf24l01p_net_stop,
-};
-
-static void nrf24l01p_get_drvinfo(struct net_device *dev, struct ethtool_drvinfo *info)
-{
-
-}
-
-static int nrf24l01p_get_settings(struct net_device *dev, struct ethtool_cmd *cmd)
-{
-	return 0;
-}
-static int nrf24l01p_set_settings(struct net_device *dev, struct ethtool_cmd *cmd)
-{
-	return 0;
-}
-
-static u32 nrf24l01p_get_msglevel(struct net_device *dev)
-{
-	return 0;
-}
-
-static void nrf24l01p_set_msglevel(struct net_device *dev, u32 val)
-{
-
-}
-
-static const struct ethtool_ops nrf24l01p_ethtool_ops = {
-	.get_settings = nrf24l01p_get_settings,
-	.set_settings = nrf24l01p_set_settings,
-	.get_drvinfo  = nrf24l01p_get_drvinfo,
-	.get_msglevel = nrf24l01p_get_msglevel,
-	.set_msglevel = nrf24l01p_set_msglevel,
+	.ndo_set_mac_address    = nrf24l01p_net_set_mac_address,
 };
 
 static void nrf24l01p_net_init(struct net_device *net)
@@ -431,12 +405,11 @@ static int nrf24l01p_probe(struct spi_device *spi)
 		dev_err(&spi->dev, "no memory");
 		return -ENOMEM;
 	}
-	net->if_port = IF_PORT_10BASET;
+	net->if_port = IF_PORT_UNKNOWN;
 	net->irq = spi->irq;
 	net->netdev_ops = &nrf24l01p_netdev_ops;
 #define TX_TIMEOUT (4 * HZ)
 	net->watchdog_timeo = TX_TIMEOUT;
-	net->ethtool_ops = &nrf24l01p_ethtool_ops;
 	SET_NETDEV_DEV(net, &spi->dev);
 	status = register_netdev(net);
 	if (status) {
@@ -446,7 +419,6 @@ static int nrf24l01p_probe(struct spi_device *spi)
 	}
 	rf = netdev_priv(net);
 	rf->netdev = net;
-	memset(rf, '\0', sizeof(*rf));
 	gpio_irq = of_get_named_gpio(np, "gpio-irq", 0);
 	gpio_ce  = of_get_named_gpio(np, "gpio-ce", 0);
 	if (gpio_irq < 0 ||
@@ -492,7 +464,7 @@ free_netdev:
 
 static int nrf24l01p_remove(struct spi_device *spi)
 {
-	struct nrf24l01p*rf = spi_get_drvdata(spi);
+	struct nrf24l01p *rf = spi_get_drvdata(spi);
 	_dbg("");
 	sysfs_remove_group(&spi->dev.kobj, &_attr_group);
 	free_irq(spi->irq, rf);
